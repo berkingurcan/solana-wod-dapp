@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react'
 import { AppConfig } from '@/constants/app-config'
 import { Cluster } from '@/components/cluster/cluster'
 import { ClusterNetwork } from '@/components/cluster/cluster-network'
@@ -13,29 +13,8 @@ export interface ClusterProviderContext {
 
 const Context = createContext<ClusterProviderContext>({} as ClusterProviderContext)
 
-// Find the default cluster based on environment variable
-function getDefaultCluster(): Cluster {
-  const defaultNetwork = AppConfig.defaultNetwork
-  console.log(`[Cluster] EXPO_PUBLIC_SOLANA_NETWORK = ${process.env.EXPO_PUBLIC_SOLANA_NETWORK}`)
-  console.log(`[Cluster] Default network from config: ${defaultNetwork}`)
-  const cluster = AppConfig.clusters.find((c) => c.network === defaultNetwork)
-  if (cluster) {
-    console.log(`[Cluster] Found matching cluster: ${cluster.name}`)
-  } else {
-    console.log(`[Cluster] No matching cluster found, falling back to: ${AppConfig.clusters[0].name}`)
-  }
-  return cluster || AppConfig.clusters[0]
-}
-
 export function ClusterProvider({ children }: { children: ReactNode }) {
-  const [selectedCluster, setSelectedCluster] = useState<Cluster>(getDefaultCluster)
-
-  // Log the active network on mount and when it changes
-  useEffect(() => {
-    console.log(`[Cluster] Active network: ${selectedCluster.name} (${selectedCluster.network})`)
-    console.log(`[Cluster] RPC endpoint: ${selectedCluster.endpoint}`)
-  }, [selectedCluster])
-
+  const [selectedCluster, setSelectedCluster] = useState<Cluster>(AppConfig.clusters[0])
   const value: ClusterProviderContext = useMemo(
     () => ({
       selectedCluster,

@@ -8,7 +8,6 @@ import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMutation } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
 import { ellipsify } from '@/utils/ellipsify'
-import { isWalletCancellationError } from '@/utils/wallet-errors'
 
 function useSignMessage({ address }: { address: PublicKey }) {
   const { signMessage } = useMobileWallet()
@@ -63,13 +62,7 @@ export function DemoFeatureSignMessage({ address }: { address: PublicKey }) {
                     })
                   }
                 })
-                .catch((err) => {
-                  if (isWalletCancellationError(err)) {
-                    console.log('User cancelled signing')
-                  } else {
-                    console.log(`Error signing message: ${err}`, err)
-                  }
-                })
+                .catch((err) => console.log(`Error signing message: ${err}`, err))
             }}
             variant="filled"
           >
@@ -77,7 +70,7 @@ export function DemoFeatureSignMessage({ address }: { address: PublicKey }) {
           </Button>
         )}
       </View>
-      {signMessage.isError && !isWalletCancellationError(signMessage.error) ? (
+      {signMessage.isError ? (
         <AppText style={{ color: 'red', fontSize: 12 }}>{`${signMessage.error.message}`}</AppText>
       ) : null}
     </AppView>

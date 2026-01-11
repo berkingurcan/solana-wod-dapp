@@ -12,7 +12,6 @@ import { useMutation } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
 import { Workout } from '@/data/workouts'
 import { AppConfig } from '@/constants/app-config'
-import { isWalletCancellationError } from '@/utils/wallet-errors'
 
 export interface MintWorkoutNftInput {
   workout: Workout
@@ -128,11 +127,7 @@ export function useMintWorkoutNft() {
       }
     },
     onError: (error) => {
-      if (isWalletCancellationError(error)) {
-        console.log('User cancelled NFT minting')
-      } else {
-        console.error('NFT mint failed:', error)
-      }
+      console.error('NFT mint failed:', error)
     },
   })
 }
