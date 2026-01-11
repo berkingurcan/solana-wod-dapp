@@ -14,6 +14,7 @@ export class AppConfig {
   // NFT Collection Config
   static nftCollectionName = 'STOIC Workouts'
   static nftCollectionSymbol = 'STOIC'
+  static nftImage = process.env.EXPO_PUBLIC_NFT_IMAGE || ''
 
   // Get the default network based on environment
   static defaultNetwork = SOLANA_NETWORK as 'devnet' | 'testnet' | 'mainnet-beta'

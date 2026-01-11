@@ -44,16 +44,6 @@ export function useMintWorkoutNft() {
         wallet: account.publicKey.toBase58(),
       })
 
-      // Check wallet balance first
-      const balance = await connection.getBalance(account.publicKey)
-      const balanceInSol = balance / 1e9
-      console.log(`[NFT Mint] Wallet balance: ${balanceInSol} SOL`)
-
-      // NFT minting requires ~0.002 SOL for rent + fees
-      if (balanceInSol < 0.003) {
-        throw new Error(`Insufficient balance: ${balanceInSol} SOL. Need at least 0.003 SOL for minting.`)
-      }
-
       const walletPubkey = account.publicKey
 
       // Generate a new keypair for the mint account
@@ -144,17 +134,14 @@ export function useMintWorkoutNft() {
     onError: (error: Error) => {
       console.error('NFT mint failed:', error)
 
-      // Provide more context for common errors
+      // Provide more context for authorization errors
       if (error.message?.includes('authorization') || error.message?.includes('Authorization')) {
         console.error(
           '[NFT Mint] Authorization failed. Please try:\n' +
           '1. Sign out of the app and sign back in\n' +
           '2. Make sure your wallet app (Phantom/Solflare) is set to MAINNET\n' +
-          '3. Approve the connection request when prompted by your wallet\n' +
-          '4. Check that you have enough SOL for transaction fees (~0.003 SOL)'
+          '3. Approve the connection request when prompted by your wallet'
         )
-      } else if (error.message?.includes('Insufficient balance')) {
-        console.error('[NFT Mint] ' + error.message)
       }
     },
   })
@@ -169,7 +156,7 @@ export function generateWorkoutNftMetadata(workout: Workout, completedAt: string
     name: `${AppConfig.nftCollectionName} - ${workout.name}`,
     symbol: AppConfig.nftCollectionSymbol,
     description: `Completed "${workout.name}" workout on ${new Date(completedAt).toLocaleDateString()}. ${workout.description}`,
-    image: '', // TODO: Generate or use placeholder image
+    image: AppConfig.nftImage,
     attributes: [
       { trait_type: 'Workout', value: workout.name },
       { trait_type: 'Difficulty', value: workout.difficulty },
