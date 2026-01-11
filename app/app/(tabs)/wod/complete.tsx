@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AppText } from '@/components/app-text'
 import { useWorkout } from '@/components/wod'
-import { useMintWorkoutNft } from '@/components/nft'
+import { useMintWorkoutNft, getUserFriendlyErrorMessage } from '@/components/nft'
 import { StoicColors } from '@/constants/colors'
 import { getWorkoutById } from '@/data/workouts'
 import Svg, { Path, Circle } from 'react-native-svg'
@@ -78,7 +78,10 @@ export default function CompleteScreen() {
       setMintSuccess(true)
     } catch (error) {
       console.error('Mint error:', error)
-      setMintError(error instanceof Error ? error.message : 'Failed to mint NFT. Please try again.')
+      const friendlyMessage = error instanceof Error
+        ? getUserFriendlyErrorMessage(error)
+        : 'Failed to mint NFT. Please try again.'
+      setMintError(friendlyMessage)
     }
   }
 

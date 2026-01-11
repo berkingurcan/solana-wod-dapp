@@ -1,4 +1,4 @@
-import { PublicKey, Keypair, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js'
+import { Keypair, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js'
 import {
   createInitializeMintInstruction,
   createAssociatedTokenAccountInstruction,
@@ -12,6 +12,46 @@ import { useMutation } from '@tanstack/react-query'
 import { useMobileWallet } from '@wallet-ui/react-native-web3js'
 import { Workout } from '@/data/workouts'
 import { AppConfig } from '@/constants/app-config'
+
+/**
+ * Convert technical errors to user-friendly messages
+ */
+export function getUserFriendlyErrorMessage(error: Error): string {
+  const message = error.message || error.toString()
+
+  // User cancelled the wallet transaction
+  if (message.includes('CancellationException') || message.includes('cancelled') || message.includes('canceled')) {
+    return 'Transaction cancelled. Please approve the transaction in your wallet to mint the NFT.'
+  }
+
+  // Insufficient balance
+  if (message.includes('Insufficient balance')) {
+    return message
+  }
+
+  // Wallet not connected
+  if (message.includes('not connected') || message.includes('Wallet not connected')) {
+    return 'Wallet not connected. Please sign in first.'
+  }
+
+  // Authorization errors
+  if (message.includes('authorization') || message.includes('Authorization')) {
+    return 'Authorization failed. Please sign out and sign back in, then try again.'
+  }
+
+  // Network/connection errors
+  if (message.includes('network') || message.includes('Network') || message.includes('fetch')) {
+    return 'Network error. Please check your connection and try again.'
+  }
+
+  // Transaction failed
+  if (message.includes('Transaction failed') || message.includes('transaction failed')) {
+    return 'Transaction failed. Please try again.'
+  }
+
+  // Default fallback
+  return 'Failed to mint NFT. Please try again.'
+}
 
 export interface MintWorkoutNftInput {
   workout: Workout
@@ -43,6 +83,17 @@ export function useMintWorkoutNft() {
         endpoint: connection.rpcEndpoint,
         wallet: account.publicKey.toBase58(),
       })
+
+      // Check wallet balance first
+      const balance = await connection.getBalance(account.publicKey)
+      const balanceInSol = balance / 1e9
+      console.log(`[NFT Mint] Wallet balance: ${balanceInSol} SOL`)
+
+      // Minimum balance check for transaction fees
+      const minRequiredBalance = 0.002 // SOL
+      if (balanceInSol < minRequiredBalance) {
+        throw new Error(`Insufficient balance: ${balanceInSol.toFixed(6)} SOL. Need at least ${minRequiredBalance} SOL for minting.`)
+      }
 
       const walletPubkey = account.publicKey
 
@@ -134,14 +185,17 @@ export function useMintWorkoutNft() {
     onError: (error: Error) => {
       console.error('NFT mint failed:', error)
 
-      // Provide more context for authorization errors
+      // Provide more context for common errors
       if (error.message?.includes('authorization') || error.message?.includes('Authorization')) {
         console.error(
           '[NFT Mint] Authorization failed. Please try:\n' +
           '1. Sign out of the app and sign back in\n' +
           '2. Make sure your wallet app (Phantom/Solflare) is set to MAINNET\n' +
-          '3. Approve the connection request when prompted by your wallet'
+          '3. Approve the connection request when prompted by your wallet\n' +
+          '4. Check that you have enough SOL for transaction fees'
         )
+      } else if (error.message?.includes('Insufficient balance')) {
+        console.error('[NFT Mint] ' + error.message)
       }
     },
   })
