@@ -36,7 +36,22 @@ export function useMintWorkoutNft() {
     mutationKey: ['mint-workout-nft'],
     mutationFn: async (input: MintWorkoutNftInput): Promise<MintWorkoutNftResult> => {
       if (!account?.publicKey) {
-        throw new Error('Wallet not connected')
+        throw new Error('Wallet not connected. Please sign in first.')
+      }
+
+      console.log('[NFT Mint] Starting mint:', {
+        endpoint: connection.rpcEndpoint,
+        wallet: account.publicKey.toBase58(),
+      })
+
+      // Check wallet balance first
+      const balance = await connection.getBalance(account.publicKey)
+      const balanceInSol = balance / 1e9
+      console.log(`[NFT Mint] Wallet balance: ${balanceInSol} SOL`)
+
+      // NFT minting requires ~0.002 SOL for rent + fees
+      if (balanceInSol < 0.003) {
+        throw new Error(`Insufficient balance: ${balanceInSol} SOL. Need at least 0.003 SOL for minting.`)
       }
 
       const walletPubkey = account.publicKey
@@ -126,8 +141,21 @@ export function useMintWorkoutNft() {
         signature,
       }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('NFT mint failed:', error)
+
+      // Provide more context for common errors
+      if (error.message?.includes('authorization') || error.message?.includes('Authorization')) {
+        console.error(
+          '[NFT Mint] Authorization failed. Please try:\n' +
+          '1. Sign out of the app and sign back in\n' +
+          '2. Make sure your wallet app (Phantom/Solflare) is set to MAINNET\n' +
+          '3. Approve the connection request when prompted by your wallet\n' +
+          '4. Check that you have enough SOL for transaction fees (~0.003 SOL)'
+        )
+      } else if (error.message?.includes('Insufficient balance')) {
+        console.error('[NFT Mint] ' + error.message)
+      }
     },
   })
 }
