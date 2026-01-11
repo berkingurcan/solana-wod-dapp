@@ -7,6 +7,7 @@ import { useWorkout } from '@/components/wod'
 import { useMintWorkoutNft } from '@/components/nft'
 import { StoicColors } from '@/constants/colors'
 import { getWorkoutById } from '@/data/workouts'
+import { isWalletCancellationError } from '@/utils/wallet-errors'
 import Svg, { Path, Circle } from 'react-native-svg'
 
 function TrophyIcon() {
@@ -77,6 +78,11 @@ export default function CompleteScreen() {
       await markNftMinted(latestCompleted.workoutId, result.mintAddress)
       setMintSuccess(true)
     } catch (error) {
+      // Don't show error for user cancellation - just silently return
+      if (isWalletCancellationError(error)) {
+        console.log('User cancelled NFT minting')
+        return
+      }
       console.error('Mint error:', error)
       setMintError(error instanceof Error ? error.message : 'Failed to mint NFT. Please try again.')
     }
