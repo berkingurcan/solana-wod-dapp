@@ -31,12 +31,11 @@ export class AppConfig {
       endpoint: clusterApiUrl('testnet'),
       network: ClusterNetwork.Testnet,
     },
-    // Uncomment for mainnet deployment
-    // {
-    //   id: 'solana:mainnet-beta',
-    //   name: 'Mainnet',
-    //   endpoint: clusterApiUrl('mainnet-beta'),
-    //   network: ClusterNetwork.Mainnet,
-    // },
+    {
+    id: 'solana:mainnet-beta',
+    name: 'Mainnet',
+    endpoint: clusterApiUrl('mainnet-beta'),
+    network: ClusterNetwork.Mainnet,
+  }
   ]
 }

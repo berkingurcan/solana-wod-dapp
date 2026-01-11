@@ -13,8 +13,23 @@ export interface ClusterProviderContext {
 
 const Context = createContext<ClusterProviderContext>({} as ClusterProviderContext)
 
+function getDefaultCluster(): Cluster {
+  const networkToClusterNetwork: Record<string, ClusterNetwork> = {
+    'devnet': ClusterNetwork.Devnet,
+    'testnet': ClusterNetwork.Testnet,
+    'mainnet-beta': ClusterNetwork.Mainnet,
+  }
+
+  const targetNetwork = networkToClusterNetwork[AppConfig.defaultNetwork]
+  const defaultCluster = AppConfig.clusters.find(c => c.network === targetNetwork) || AppConfig.clusters[0]
+
+  console.log(`[Solana] Network: ${AppConfig.defaultNetwork} (${defaultCluster.name})`)
+
+  return defaultCluster
+}
+
 export function ClusterProvider({ children }: { children: ReactNode }) {
-  const [selectedCluster, setSelectedCluster] = useState<Cluster>(AppConfig.clusters[0])
+  const [selectedCluster, setSelectedCluster] = useState<Cluster>(() => getDefaultCluster())
   const value: ClusterProviderContext = useMemo(
     () => ({
       selectedCluster,
