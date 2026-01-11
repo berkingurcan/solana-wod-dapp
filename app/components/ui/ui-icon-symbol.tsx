@@ -16,6 +16,9 @@ const MAPPING = {
   'gearshape.fill': 'settings',
   'wallet.pass.fill': 'wallet',
   'ladybug.fill': 'bug-report',
+  'figure.run': 'fitness-center',
+  'photo.stack': 'collections',
+  'trophy.fill': 'emoji-events',
 } as UiIconMapping
 
 /**

@@ -2,9 +2,22 @@ import { clusterApiUrl } from '@solana/web3.js'
 import { Cluster } from '@/components/cluster/cluster'
 import { ClusterNetwork } from '@/components/cluster/cluster-network'
 
+// Environment-based network selection
+// Set EXPO_PUBLIC_SOLANA_NETWORK=mainnet-beta in .env for mainnet
+const SOLANA_NETWORK = process.env.EXPO_PUBLIC_SOLANA_NETWORK || 'devnet'
+
 export class AppConfig {
-  static name = 'app'
-  static uri = 'https://example.com'
+  static name = 'STOIC'
+  static description = 'Forge Your Body. Mint Your Legacy.'
+  static uri = 'https://stoic.app'
+
+  // NFT Collection Config
+  static nftCollectionName = 'STOIC Workouts'
+  static nftCollectionSymbol = 'STOIC'
+
+  // Get the default network based on environment
+  static defaultNetwork = SOLANA_NETWORK as 'devnet' | 'testnet' | 'mainnet-beta'
+
   static clusters: Cluster[] = [
     {
       id: 'solana:devnet',
@@ -18,5 +31,12 @@ export class AppConfig {
       endpoint: clusterApiUrl('testnet'),
       network: ClusterNetwork.Testnet,
     },
+    // Uncomment for mainnet deployment
+    // {
+    //   id: 'solana:mainnet-beta',
+    //   name: 'Mainnet',
+    //   endpoint: clusterApiUrl('mainnet-beta'),
+    //   network: ClusterNetwork.Mainnet,
+    // },
   ]
 }

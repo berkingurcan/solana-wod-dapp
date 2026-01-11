@@ -4,15 +4,20 @@ import { PropsWithChildren } from 'react'
 import { AuthProvider } from '@/components/auth/auth-provider'
 import { ClusterProvider, useCluster } from '@/components/cluster/cluster-provider'
 import { AppTheme } from '@/components/app-theme'
+import { WorkoutProvider } from '@/components/wod'
+import { AppConfig } from '@/constants/app-config'
 
 const queryClient = new QueryClient()
+
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <AppTheme>
       <QueryClientProvider client={queryClient}>
         <ClusterProvider>
           <SolanaProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <WorkoutProvider>{children}</WorkoutProvider>
+            </AuthProvider>
           </SolanaProvider>
         </ClusterProvider>
       </QueryClientProvider>
@@ -28,7 +33,7 @@ function SolanaProvider({ children }: PropsWithChildren) {
     <MobileWalletProvider
       chain={selectedCluster.id}
       endpoint={selectedCluster.endpoint}
-      identity={{ name: 'Wallet UI Example Web3js Expo' }}
+      identity={{ name: AppConfig.name, uri: AppConfig.uri }}
     >
       {children}
     </MobileWalletProvider>

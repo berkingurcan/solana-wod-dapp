@@ -1,23 +1,24 @@
 {
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "STOIC",
+    "slug": "stoic-wod",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "templateexpobasic",
-    "userInterfaceStyle": "automatic",
+    "scheme": "stoic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "app.stoic.wod"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0A0A0A"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.beeman.web3jsexpo"
+      "package": "app.stoic.wod"
     },
     "web": {
       "bundler": "metro",
@@ -29,11 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFFFFF",
-          "dark": {
-            "backgroundColor": "#000000",
-            "image": "./assets/images/splash-icon.png"
-          },
+          "backgroundColor": "#FAFAFA",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain"
